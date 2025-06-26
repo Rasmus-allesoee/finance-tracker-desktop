@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- **PHASE 2 ADDITION**: Toastify CSS for notifications -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -22,57 +24,43 @@
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             font-weight: 600;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color 0.3s, color 0.3s, opacity 0.3s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
         }
-        .btn-primary {
-            background-color: #4f46e5;
-            color: white;
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
-        .btn-primary:hover {
-            background-color: #4338ca;
-        }
-        .btn-secondary {
-            background-color: #e5e7eb;
-            color: #374151;
-        }
-        .btn-secondary:hover {
-            background-color: #d1d5db;
-        }
+        .btn-primary { background-color: #4f46e5; color: white; }
+        .btn-primary:hover:not(:disabled) { background-color: #4338ca; }
+        .btn-secondary { background-color: #e5e7eb; color: #374151; }
+        .btn-secondary:hover:not(:disabled) { background-color: #d1d5db; }
         .input-field {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            width: 100%; padding: 0.75rem; border: 1px solid #d1d5db;
+            border-radius: 0.5rem; transition: border-color 0.3s, box-shadow 0.3s;
         }
         .input-field:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 2px #c7d2fe;
+            outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px #c7d2fe;
         }
         .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.75rem;
         }
-        .transaction-income {
-            border-left: 5px solid #10b981;
-        }
-        .transaction-expense {
-            border-left: 5px solid #ef4444;
-        }
+        .transaction-income { border-left: 5px solid #10b981; }
+        .transaction-expense { border-left: 5px solid #ef4444; }
         .modal-bg {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);
         }
+        /* **PHASE 2 ADDITION**: Spinner for buttons */
+        .spinner {
+            animation: spin 1s linear infinite;
+            height: 1.25rem; /* h-5 */
+            width: 1.25rem; /* w-5 */
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -86,7 +74,6 @@
     </div>
 
     <main class="w-full">
-        <!-- Authentication Section (Initially Shown by logic) -->
         <div id="auth-container" class="hidden w-full max-w-sm mx-auto">
             <div class="card p-8">
                 <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Sign In / Sign Up</h2>
@@ -94,64 +81,39 @@
                     <input type="email" id="email-input" placeholder="Email" class="input-field" required>
                     <input type="password" id="password-input" placeholder="Password (min. 6 characters)" class="input-field" required>
                     <div class="flex gap-4">
-                        <button type="submit" id="login-btn" class="btn btn-primary w-full">Login</button>
-                        <button type="submit" id="signup-btn" class="btn btn-secondary w-full">Sign Up</button>
+                        <button type="submit" id="login-btn" class="btn btn-primary w-full"><span>Login</span></button>
+                        <button type="submit" id="signup-btn" class="btn btn-secondary w-full"><span>Sign Up</span></button>
                     </div>
                 </form>
                 <div class="relative flex py-5 items-center">
-                    <div class="flex-grow border-t border-gray-300"></div>
-                    <span class="flex-shrink mx-4 text-gray-400">OR</span>
-                    <div class="flex-grow border-t border-gray-300"></div>
+                    <div class="flex-grow border-t border-gray-300"></div><span class="flex-shrink mx-4 text-gray-400">OR</span><div class="flex-grow border-t border-gray-300"></div>
                 </div>
                 <button id="google-signin-btn" class="btn btn-secondary w-full">
                      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"></path><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"></path><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.244,44,30.036,44,24C44,22.659,43.862,21.35,43.611,20.083z"></path></svg>
-                    Sign in with Google
+                    <span>Sign in with Google</span>
                 </button>
             </div>
         </div>
 
-        <!-- Main App Content (Initially Hidden by logic) -->
         <div id="app-content" class="hidden w-full max-w-5xl mx-auto relative">
             <button id="logout-btn" class="absolute -top-4 right-0 btn btn-secondary !py-2 !px-3">Logout</button>
-            <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-gray-800">Finance Tracker</h1>
-                <p class="text-gray-500 mt-1">Your personal income and expense dashboard.</p>
-            </header>
-
+            <header class="text-center mb-8"><h1 class="text-4xl font-bold text-gray-800">Finance Tracker</h1><p class="text-gray-500 mt-1">Your personal income and expense dashboard.</p></header>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Left Column: Summary and Form -->
                 <div class="md:col-span-1 flex flex-col gap-8">
-                    <!-- Summary Card -->
                     <div class="card p-6">
                         <h2 class="text-xl font-semibold text-gray-700 mb-4">Balance Summary</h2>
                         <div class="space-y-4">
-                            <div>
-                                <p class="text-sm text-gray-500">Total Income</p>
-                                <p id="total-income" class="text-2xl font-bold text-green-600">$0.00</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-500">Total Expenses</p>
-                                <p id="total-expenses" class="text-2xl font-bold text-red-600">$0.00</p>
-                            </div>
+                            <div><p class="text-sm text-gray-500">Total Income</p><p id="total-income" class="text-2xl font-bold text-green-600">$0.00</p></div>
+                            <div><p class="text-sm text-gray-500">Total Expenses</p><p id="total-expenses" class="text-2xl font-bold text-red-600">$0.00</p></div>
                             <hr class="my-4">
-                            <div>
-                                <p class="text-sm text-gray-500">Net Balance</p>
-                                <p id="net-balance" class="text-3xl font-bold text-gray-800">$0.00</p>
-                            </div>
+                            <div><p class="text-sm text-gray-500">Net Balance</p><p id="net-balance" class="text-3xl font-bold text-gray-800">$0.00</p></div>
                         </div>
                     </div>
-                    <!-- Form Card -->
                     <div class="card p-6">
                         <h2 class="text-xl font-semibold text-gray-700 mb-4">Add Transaction</h2>
                         <form id="transaction-form" class="space-y-4">
-                            <div>
-                                <label for="description" class="block text-sm font-medium text-gray-600">Description</label>
-                                <input type="text" id="description" class="input-field mt-1" placeholder="e.g., Groceries, Paycheck" required>
-                            </div>
-                            <div>
-                                <label for="amount" class="block text-sm font-medium text-gray-600">Amount</label>
-                                <input type="number" id="amount" class="input-field mt-1" placeholder="0.00" step="0.01" min="0" required>
-                            </div>
+                            <div><label for="description" class="block text-sm font-medium text-gray-600">Description</label><input type="text" id="description" class="input-field mt-1" placeholder="e.g., Groceries, Paycheck" required></div>
+                            <div><label for="amount" class="block text-sm font-medium text-gray-600">Amount</label><input type="number" id="amount" class="input-field mt-1" placeholder="0.00" step="0.01" min="0" required></div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600">Type</label>
                                 <div class="flex gap-4 mt-2">
@@ -159,31 +121,25 @@
                                     <label class="flex items-center"><input type="radio" name="type" value="expense" class="form-radio text-indigo-600"><span class="ml-2 text-gray-700">Expense</span></label>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-full !mt-6">Add Transaction</button>
+                            <button type="submit" id="add-transaction-btn" class="btn btn-primary w-full !mt-6"><span>Add Transaction</span></button>
                         </form>
                     </div>
                 </div>
-
-                <!-- Right Column: History -->
                 <div class="md:col-span-2 card p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-gray-700">Transaction History</h2>
-                        <button id="export-csv-btn" class="btn btn-secondary !py-2">Export to CSV</button>
+                        <h2 class="text-xl font-semibold text-gray-700">Transaction History</h2><button id="export-csv-btn" class="btn btn-secondary !py-2">Export to CSV</button>
                     </div>
                     <div id="transaction-list-container" class="h-[60vh] overflow-y-auto pr-2">
-                        <ul id="transaction-list"></ul>
-                        <p id="no-transactions" class="hidden text-center text-gray-500 mt-8">No transactions yet.</p>
+                        <ul id="transaction-list"></ul><p id="no-transactions" class="hidden text-center text-gray-500 mt-8">No transactions yet.</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Delete Modal -->
     <div id="delete-modal" class="hidden fixed inset-0 modal-bg flex items-center justify-center p-4">
         <div class="card w-full max-w-md p-6">
-            <h3 class="text-lg font-semibold text-gray-800">Confirm Deletion</h3>
-            <p class="text-gray-600 mt-2">Are you sure? This action cannot be undone.</p>
+            <h3 class="text-lg font-semibold text-gray-800">Confirm Deletion</h3><p class="text-gray-600 mt-2">Are you sure? This action cannot be undone.</p>
             <div class="flex justify-end gap-4 mt-6">
                 <button id="cancel-delete" class="px-4 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 transition">Cancel</button>
                 <button id="confirm-delete" class="px-4 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition">Delete</button>
@@ -191,129 +147,186 @@
         </div>
     </div>
 
+    <!-- **PHASE 2 ADDITION**: Toastify JS for notifications -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        // --- UPDATED FIREBASE IMPORTS ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, addDoc, onSnapshot, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- DOM Elements ---
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const authContainer = document.getElementById('auth-container');
-        const appContent = document.getElementById('app-content');
-        const transactionList = document.getElementById('transaction-list');
-        // ... (all your other element selectors)
-        const form = document.getElementById('transaction-form');
-        const totalIncomeEl = document.getElementById('total-income');
-        const totalExpensesEl = document.getElementById('total-expenses');
-        const netBalanceEl = document.getElementById('net-balance');
-        const noTransactionsMessage = document.getElementById('no-transactions');
-        const exportCsvBtn = document.getElementById('export-csv-btn');
-        const deleteModal = document.getElementById('delete-modal');
-        const cancelDeleteBtn = document.getElementById('cancel-delete');
-        const confirmDeleteBtn = document.getElementById('confirm-delete');
-
-
-        // --- FIREBASE CONFIG - REPLACE WITH YOURS ---
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+        const allDOMElements = {
+            loadingSpinner: document.getElementById('loading-spinner'),
+            authContainer: document.getElementById('auth-container'),
+            appContent: document.getElementById('app-content'),
+            emailForm: document.getElementById('email-password-form'),
+            emailInput: document.getElementById('email-input'),
+            passwordInput: document.getElementById('password-input'),
+            googleBtn: document.getElementById('google-signin-btn'),
+            logoutBtn: document.getElementById('logout-btn'),
+            transactionForm: document.getElementById('transaction-form'),
+            addTransactionBtn: document.getElementById('add-transaction-btn'),
+            transactionList: document.getElementById('transaction-list'),
+            totalIncomeEl: document.getElementById('total-income'),
+            totalExpensesEl: document.getElementById('total-expenses'),
+            netBalanceEl: document.getElementById('net-balance'),
+            noTransactionsMessage: document.getElementById('no-transactions'),
+            exportCsvBtn: document.getElementById('export-csv-btn'),
+            deleteModal: document.getElementById('delete-modal'),
+            cancelDeleteBtn: document.getElementById('cancel-delete'),
+            confirmDeleteBtn: document.getElementById('confirm-delete'),
         };
 
-        // --- APP STATE ---
-        let db, auth;
-        let transactionsCollection;
-        let currentUserId;
-        let transactionToDeleteId = null;
-        let allTransactions = []; 
+        const firebaseConfig = {
+            apiKey: "AIzaSyD9i7TlFuM53eRz8PI6p-r2ZFvUEO7n974",
+            authDomain: "my-finance-tracker-3b8a3.firebaseapp.com",
+            projectId: "my-finance-tracker-3b8a3",
+            storageBucket: "my-finance-tracker-3b8a3.firebasestorage.app",
+            messagingSenderId: "953559137343",
+            appId: "1:953559137343:web:0cb807bf35f154b4874c8a",
+            measurementId: "G-SR5PN2YH6H"
+        };
 
-        // --- INITIALIZE ---
+        let db, auth, transactionsCollection, currentUserId, transactionToDeleteId = null, allTransactions = [];
+
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-        } catch (e) {
-            console.error("Error initializing Firebase:", e);
-            loadingSpinner.innerText = "Error connecting. Please check your Firebase config.";
-        }
+        } catch (e) { console.error("Error initializing Firebase:", e); allDOMElements.loadingSpinner.innerText = "Error connecting. Please check your Firebase config."; }
 
-        // --- NEW AUTHENTICATION LOGIC ---
+        // --- PHASE 2: UX HELPER FUNCTIONS ---
+        const showToast = (message, type = 'success') => {
+            const colors = { success: '#10b981', error: '#ef4444' };
+            Toastify({ text: message, duration: 3000, gravity: "top", position: "right",
+                style: { background: colors[type] || colors.success, borderRadius: '0.5rem' }
+            }).showToast();
+        };
+
+        const spinnerSVG = `<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+        const showSpinner = (button) => {
+            button.disabled = true;
+            button.innerHTML = spinnerSVG;
+        };
+        const hideSpinner = (button, originalText) => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        };
+        
+        const handleAuthError = (error) => {
+            switch (error.code) {
+                case 'auth/invalid-email': showToast('Please enter a valid email address.', 'error'); break;
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                case 'auth/invalid-credential': showToast('Invalid email or password. Please try again.', 'error'); break;
+                case 'auth/email-already-in-use': showToast('An account with this email already exists.', 'error'); break;
+                case 'auth/weak-password': showToast('Password should be at least 6 characters.', 'error'); break;
+                default: showToast('An unexpected error occurred. Please try again.', 'error'); break;
+            }
+        };
+
+        // --- AUTHENTICATION ---
         onAuthStateChanged(auth, user => {
+            const { authContainer, appContent, loadingSpinner, transactionList } = allDOMElements;
             if (user) {
-                // User is signed in.
                 currentUserId = user.uid;
                 transactionsCollection = collection(db, 'transactions', currentUserId, 'items');
                 setupFirestoreListener();
-                
                 appContent.classList.remove('hidden');
                 authContainer.classList.add('hidden');
-                loadingSpinner.classList.add('hidden');
             } else {
-                // User is signed out.
+                currentUserId = null;
+                transactionsCollection = null;
                 authContainer.classList.remove('hidden');
                 appContent.classList.add('hidden');
-                loadingSpinner.classList.add('hidden');
-                // Clear any old data from the UI
                 transactionList.innerHTML = '';
                 allTransactions = [];
             }
+            loadingSpinner.classList.add('hidden');
         });
 
-        // --- EVENT HANDLERS FOR NEW AUTH UI ---
-        const emailForm = document.getElementById('email-password-form');
-        const emailInput = document.getElementById('email-input');
-        const passwordInput = document.getElementById('password-input');
-
-        emailForm.addEventListener('click', async (e) => {
+        allDOMElements.emailForm.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (e.target.tagName !== 'BUTTON') return;
+            const button = e.target.closest('button');
+            if (!button) return;
 
+            const originalText = button.innerHTML;
+            const { emailInput, passwordInput } = allDOMElements;
             const email = emailInput.value;
             const password = passwordInput.value;
 
-            if (!email || !password) {
-                alert("Please enter both email and password.");
-                return;
-            }
-
+            if (!email || !password) { showToast("Please enter both email and password.", 'error'); return; }
+            
+            showSpinner(button);
             try {
-                if (e.target.id === 'login-btn') {
+                if (button.id === 'login-btn') {
                     await signInWithEmailAndPassword(auth, email, password);
-                } else if (e.target.id === 'signup-btn') {
+                } else if (button.id === 'signup-btn') {
                     await createUserWithEmailAndPassword(auth, email, password);
                 }
             } catch (error) {
-                alert(error.message); // TODO: Replace with a nicer UI element in Phase 2
+                handleAuthError(error);
+            } finally {
+                hideSpinner(button, originalText);
             }
         });
 
-        document.getElementById('google-signin-btn').addEventListener('click', async () => {
+        allDOMElements.googleBtn.addEventListener('click', async () => {
+            const button = allDOMElements.googleBtn;
+            const originalText = button.innerHTML;
+            showSpinner(button);
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
-                alert(error.message);
+                handleAuthError(error);
+            } finally {
+                hideSpinner(button, originalText);
             }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth);
+        allDOMElements.logoutBtn.addEventListener('click', () => { signOut(auth); showToast('You have been logged out.'); });
+        
+        allDOMElements.transactionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = allDOMElements.addTransactionBtn;
+            const originalText = button.innerHTML;
+            const description = document.getElementById('description').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.querySelector('input[name="type"]:checked').value;
+            if (!description || isNaN(amount) || amount <= 0) return;
+            
+            showSpinner(button);
+            try {
+                await addDoc(transactionsCollection, { description, amount, type, createdAt: serverTimestamp() });
+                allDOMElements.transactionForm.reset();
+                showToast('Transaction added successfully!');
+            } catch (error) {
+                console.error("Error adding transaction:", error);
+                showToast('Failed to add transaction.', 'error');
+            } finally {
+                hideSpinner(button, originalText);
+            }
         });
         
-        // --- (EXISTING CODE - NO CHANGES NEEDED BELOW THIS LINE) ---
-        
+        allDOMElements.confirmDeleteBtn.addEventListener('click', async () => {
+            if (!transactionToDeleteId) return;
+            const button = allDOMElements.confirmDeleteBtn;
+            const originalText = button.innerText;
+            showSpinner(button);
+            try {
+                const docRef = doc(db, 'transactions', currentUserId, 'items', transactionToDeleteId);
+                await deleteDoc(docRef);
+                showToast('Transaction deleted.');
+            } catch (error) {
+                showToast('Failed to delete transaction.', 'error');
+            } finally {
+                hideSpinner(button, originalText);
+                allDOMElements.deleteModal.classList.add('hidden');
+                transactionToDeleteId = null;
+            }
+        });
+
+        // --- HELPER & RENDER FUNCTIONS ---
         function setupFirestoreListener() {
             if (!currentUserId || !transactionsCollection) return;
             const q = query(transactionsCollection, orderBy("createdAt", "desc"));
@@ -328,6 +341,7 @@
         }
 
         function renderUI(transactions) {
+            const { transactionList, totalIncomeEl, totalExpensesEl, netBalanceEl, noTransactionsMessage, exportCsvBtn } = allDOMElements;
             transactionList.innerHTML = '';
             let income = 0, expenses = 0;
             noTransactionsMessage.classList.toggle('hidden', transactions.length > 0);
@@ -359,45 +373,21 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
                     </button>
                 </div>`;
-            transactionList.appendChild(item);
+            allDOMElements.transactionList.appendChild(item);
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const description = document.getElementById('description').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const type = document.querySelector('input[name="type"]:checked').value;
-            if (!description || isNaN(amount) || amount <= 0) return;
-            try {
-                await addDoc(transactionsCollection, { description, amount, type, createdAt: serverTimestamp() });
-                form.reset();
-            } catch (error) { console.error("Error adding transaction:", error); }
-        });
-        
-        transactionList.addEventListener('click', (e) => {
+        allDOMElements.transactionList.addEventListener('click', (e) => {
             const deleteButton = e.target.closest('.delete-btn');
             if (deleteButton) {
                 transactionToDeleteId = deleteButton.dataset.id;
-                deleteModal.classList.remove('hidden');
+                allDOMElements.deleteModal.classList.remove('hidden');
             }
         });
-        
-        cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
-        
-        confirmDeleteBtn.addEventListener('click', async () => {
-            if (!transactionToDeleteId) return;
-            try {
-                const docRef = doc(db, 'transactions', currentUserId, 'items', transactionToDeleteId);
-                await deleteDoc(docRef);
-            } catch (error) { console.error("Error deleting transaction:", error);
-            } finally {
-                deleteModal.classList.add('hidden');
-                transactionToDeleteId = null;
-            }
-        });
-        
-        exportCsvBtn.addEventListener('click', () => {
-            if (allTransactions.length === 0) { alert("No transactions to export."); return; }
+
+        allDOMElements.cancelDeleteBtn.addEventListener('click', () => allDOMElements.deleteModal.classList.add('hidden'));
+
+        allDOMElements.exportCsvBtn.addEventListener('click', () => {
+            if (allTransactions.length === 0) { showToast("No transactions to export.", 'error'); return; }
             const headers = ['Date', 'Description', 'Type', 'Amount'];
             const rows = allTransactions.map(t => {
                 const date = t.createdAt ? new Date(t.createdAt.toDate()).toLocaleDateString('en-CA') : '';
@@ -410,15 +400,13 @@
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
             link.setAttribute("download", `transactions_${new Date().toISOString().slice(0,10)}.csv`);
-            link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         });
+        
+        function formatCurrency(value) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value); }
 
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-        }
     </script>
 </body>
 </html>

@@ -19,7 +19,8 @@ function createWindow() {
   mainWindow.loadFile('index.html');
 
   // Optional: Open the DevTools for debugging.
-  mainWindow.webContents.openDevTools();
+  // Uncomment the line below to see the console when you start the app.
+  // mainWindow.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
