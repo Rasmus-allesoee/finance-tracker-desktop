@@ -1,0 +1,20 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Gradient -->
+    <rect width="1024" height="1024" rx="220" fill="url(#gradient)"/>
+
+    <!-- Icon Symbol: A simple, modern chart/graph -->
+    <path d="M256 768V448C256 430.327 270.327 416 288 416H368C385.673 416 400 430.327 400 448V768C400 785.673 385.673 800 368 800H288C270.327 800 256 785.673 256 768Z" fill="white" fill-opacity="0.9"/>
+    <path d="M464 768V320C464 302.327 478.327 288 496 288H576C593.673 288 608 302.327 608 320V768C608 785.673 593.673 800 576 800H496C478.327 800 464 785.673 464 768Z" fill="white" fill-opacity="0.9"/>
+    <path d="M672 768V576C672 558.327 686.327 544 704 544H784C801.673 544 816 558.327 816 576V768C816 785.673 801.673 800 784 800H704C686.327 800 672 785.673 672 768Z" fill="white" fill-opacity="0.9"/>
+    
+    <!-- Subtle shine/glare effect on the top-left -->
+    <path d="M220 0H512C512 0 355.753 113.636 258.5 220C161.247 326.364 0 220 0 220V220C98.4975 220 220 98.4975 220 0Z" fill="white" fill-opacity="0.1"/>
+
+    <!-- Gradient Definition -->
+    <defs>
+        <linearGradient id="gradient" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4F46E5"/> <!-- Indigo -->
+            <stop offset="1" stop-color="#3B82F6"/> <!-- Blue -->
+        </linearGradient>
+    </defs>
+</svg>
